@@ -4,12 +4,19 @@ import pygame
 
 pygame.init()
 
+# ----- Variáveis
+LENGTH = 840
+WIDTH = 650
+CAR_LENGTH = 84
+CAR_WIDTH = 65
 # ----- Gera tela principal
 window = pygame.display.set_mode((840, 650))
 pygame.display.set_caption('Need For Speed 2D')
 
 # ----- Inicia Assets
 background = pygame.image.load('img/background.png').convert()
+imagem_carro = pygame.image.load('imag/carro.png').convert()
+imagem_carro_transform = pygame.transform.scale(imagem_carro, (84, 65))
 
 # ----- Inicia estruturas de dados
 game = True
