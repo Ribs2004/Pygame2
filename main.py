@@ -14,13 +14,34 @@ window = pygame.display.set_mode((840, 650))
 pygame.display.set_caption('Need For Speed 2D')
 
 # ----- Inicia Assets
-background = pygame.image.load('img/background.png').convert()
-imagem_carro = pygame.image.load('imag/carro.png').convert()
-imagem_carro_transform = pygame.transform.scale(imagem_carro, (84, 65))
-
+def load_assets():
+    assets = {}
+    assets['background'] = pygame.image.load('img/background.png').convert()
+    assets['imagem_carro'] = pygame.image.load('img/carro.png').convert_alpha()
+    assets['imagem_carro_transform'] = pygame.transform.scale(assets['imagem_carro'],(CAR_LENGTH,CAR_WIDTH))
+    return assets
 # ----- Inicia estruturas de dados
 game = True
+# ----- Definindo os novos tipos
+class Car(pygame.sprite.Sprite):
+    def __init__(self,groups,assets):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = assets['imagem_carro']
+        self.mask = pygame.mask.from_surface(self.image)
+        self.rect = self.image.get_rect()
+        self.rect.centerx = WIDTH / 2
+        self.rect.bottom = LENGTH - 10
+        self.speedx = 0
+        self.groups = groups
+        self.assets = assets
 
+    def update(self):
+            self.rect.x += self.speedx
+            if self.rect.right > WIDTH:
+                self.rect.right = WIDTH
+            if self.rect.left < 0:
+                self.rect.left = 0
+assets = load_assets()
 # ===== Loop principal =====
 while game:
     # ----- Trata eventos
@@ -33,7 +54,7 @@ while game:
 
     # ----- Gera saídas
     window.fill((0, 0, 255))  # Preenche com a cor branca
-    window.blit(background, (0, 0))
+    window.blit(assets['background'], (0, 0))
 
     # ----- Atualiza estado do jogo
     pygame.display.update()  # Mostra o novo frame para o jogador
