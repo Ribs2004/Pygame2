@@ -1,11 +1,12 @@
 # ===== Inicialização =====
 # ----- Importa e inicia pacotes
 import pygame
+from random import *
 
 pygame.init()
 
 # ----- Variáveis
-LENGTH = 840
+HEIGHT = 840
 WIDTH = 650
 CAR_LENGTH = 140
 CAR_WIDTH = 105
@@ -15,8 +16,8 @@ pygame.display.set_caption('Need For Speed 2D')
 
 # ----- Inicia Assets 
 background = pygame.image.load('img/background.png').convert()
-img = pygame.image.load('img/carro.png').convert_alpha()
-img_transform = pygame.transform.scale(img ,(CAR_LENGTH,CAR_WIDTH))
+player_car = pygame.image.load('img/carro.png').convert_alpha()
+player_car = pygame.transform.scale(player_car ,(CAR_LENGTH,CAR_WIDTH))
 
 # ----- Inicia estruturas de dados
 game = True
@@ -44,10 +45,34 @@ class Car(pygame.sprite.Sprite):
             if self.rect.left < 120:
                 self.rect.left = 120
 
+class Obstacles(pygame.sprite.Sprite):
+    def __init__(self, img):
+        pygame.sprite.Sprite.__init__(self)
+
+        self.image =img
+        self.rect = self.image.get_rect()
+        self.rect.x = randint(105, 630)
+        self.rect.y = -100
+        self.speedy = randint(10, 22)
+    
+    def update(self):
+        self.rect.y += self.speedy
+
+        if self.rect.top > HEIGHT:
+            self.rect.x = randint(105, 630)
+            self.rect.y = -100
+
 #assets = load_assets()
 all_sprites = pygame.sprite.Group()
-carro = Car(img_transform)
+all_obstacles = pygame.sprite.Group()
+carro = Car(player_car)
 all_sprites.add(carro)
+for c in range (0, 4):
+    carro_obstaculo = Obstacles(player_car)
+    all_sprites.add(carro_obstaculo)
+    all_obstacles.add(carro_obstaculo)
+all_sprites.add(carro)
+
 
 # ===== Loop principal =====
 while game:
@@ -61,24 +86,21 @@ while game:
         if event.type == pygame.KEYDOWN:
             # Dependendo da tecla, altera a velocidade.
             if event.key == pygame.K_LEFT:
-                carro.speedx -= 8
+                carro.speedx -= 14
             if event.key == pygame.K_RIGHT:
-                carro.speedx += 8
+                carro.speedx += 14
         # Verifica se soltou alguma tecla.
         if event.type == pygame.KEYUP:
             # Dependendo da tecla, altera a velocidade.
             if event.key == pygame.K_LEFT:
-                carro.speedx += 8
+                carro.speedx += 14
             if event.key == pygame.K_RIGHT:
-                carro.speedx -= 8
+                carro.speedx -= 14
         
 
     all_sprites.update()
-    # ----- Gera saídas
-    window.fill((0, 0, 255))  # Preenche com a cor branca
     window.blit(background, (0, 0))
     all_sprites.draw(window)
-    # ----- Atualiza estado do jogo
     pygame.display.update()  # Mostra o novo frame para o jogador
 
 # ===== Finalização =====
