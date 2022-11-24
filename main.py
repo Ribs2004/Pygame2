@@ -18,6 +18,17 @@ pygame.display.set_caption('Need For Speed 2D')
 background = pygame.image.load('img/background.png').convert()
 player_car = pygame.image.load('img/carro.png').convert_alpha()
 player_car = pygame.transform.scale(player_car ,(CAR_LENGTH,CAR_WIDTH))
+explosion_anim = []
+for i in range(9):
+    filename = 'img/regularExplosion{}.png'.format(i)
+    img = pygame.image.load(filename).convert()
+    img = pygame.transform.scale(img,(40,40))
+    explosion_anim.append(img)
+
+#Carrega os sons do jogo
+pygame.mixer.music.set_volume(0.5)
+crash_sound = pygame.mixer.Sound('snd/car_crash.wav')
+
 
 # ----- Inicia estruturas de dados
 game = True
@@ -61,6 +72,38 @@ class Obstacles(pygame.sprite.Sprite):
         if self.rect.top > HEIGHT:
             self.rect.x = randint(105, 630)
             self.rect.y = -100
+class Crash(pygame.sprite.Sprite):
+    def __init__(self,center):
+        pygame.sprite.Sprite.__init__(self)
+        #Armazena a animação de acidente
+        self.explosion_anim = explosion_anim
+        #Inicia o processo de animação colocando a primeira imagem na tela.
+        self.frame = 0
+        self.image = self.explosion_anim[self.frame]
+        self.rect = self.image.get_rect()
+        self.rect.center = center
+
+        # Guarda o tick da primeira imagem, ou seja, o momento em que a imagem foi mostrada
+        self.last_update = pygame.time.get_ticks()
+
+        self.frame_ticks = 50
+    def update(self):
+        now = pygame.time.get_ticks()
+        elapsed_ticks = now - self.last_update
+
+        # Se já está na hora de mudar de imagem
+        if elapsed_ticks > self.frame_ticks:
+            self.last_update = now
+            self.frame += 1
+            if self.frame == len(self.explosion_anim):
+                self.kill()
+            else:
+                center = self.rect.center
+                self.image  = self.explosion_anim[self.frame]
+                self.rect = self.image.get_rect()
+                self.rect.center = center
+
+
 
 #assets = load_assets()
 all_sprites = pygame.sprite.Group()
@@ -73,9 +116,14 @@ for c in range (0, 4):
     all_obstacles.add(carro_obstaculo)
 all_sprites.add(carro)
 
+DONE = 0
+PLAYING = 1
+EXPLODING = 2
+state = PLAYING
+
 
 # ===== Loop principal =====
-while game:
+while state != DONE:
     clock.tick(FPS)
 
     # ----- Trata eventos
@@ -96,6 +144,21 @@ while game:
                 carro.speedx += 14
             if event.key == pygame.K_RIGHT:
                 carro.speedx -= 14
+    if state == PLAYING:
+        hits = pygame.sprite.groupcollide(player_car,all_obstacles,True,pygame.sprite.collide_mask)
+        if len(hits) > 0:
+            crash_sound.play()
+            player_car.kill()
+            # Adiciona vidas?
+            explosao = Crash(player_car.rect.center)
+            all_sprites.add(explosao)
+            state = EXPLODING
+            keys_down = {}
+            explosion_tick = pygame.time.get_ticks()
+            explosion_duration = explosao.frame_ticks * len(explosao.explosion_anim) + 400
+    
+
+
         
 
     all_sprites.update()
