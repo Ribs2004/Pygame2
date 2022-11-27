@@ -148,7 +148,7 @@ while state != DONE:
             if event.key == pygame.K_RIGHT:
                 carro.speedx -= 14
     if state == PLAYING:
-        hits = pygame.sprite.groupcollide(player_car,all_obstacles,True,pygame.sprite.collide_mask)
+        hits = pygame.sprite.groupcollide(player_car,all_obstacles,True,True,pygame.sprite.collide_mask)
         if len(hits) > 0:
             crash_sound.play()
             player_car.kill()
