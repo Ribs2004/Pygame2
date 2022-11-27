@@ -37,6 +37,7 @@ game = True
 # ----- Variável para ajuste de velocidade
 clock = pygame.time.Clock()
 FPS = 30
+
 # ----- Definindo os novos tipos
 class Car(pygame.sprite.Sprite):
     def __init__(self,img):
