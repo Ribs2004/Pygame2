@@ -19,8 +19,9 @@ background = pygame.image.load('img/background.png').convert()
 player_car = pygame.image.load('img/carro.png').convert_alpha()
 player_car = pygame.transform.scale(player_car ,(CAR_LENGTH,CAR_WIDTH))
 explosion_anim = []
+
 for i in range(9):
-    filename = 'img/regularExplosion{}.png'.format(i)
+    filename = 'img/regularExplosion{:02d}.png'.format(i)
     img = pygame.image.load(filename).convert()
     img = pygame.transform.scale(img,(40,40))
     explosion_anim.append(img)
@@ -72,6 +73,7 @@ class Obstacles(pygame.sprite.Sprite):
         if self.rect.top > HEIGHT:
             self.rect.x = randint(105, 630)
             self.rect.y = -100
+
 class Crash(pygame.sprite.Sprite):
     def __init__(self,center):
         pygame.sprite.Sprite.__init__(self)
