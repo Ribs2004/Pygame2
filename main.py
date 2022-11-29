@@ -8,9 +8,9 @@ pygame.init()
 # ----- Variáveis
 HEIGHT = 840
 WIDTH = 650
-CAR_LENGTH = 140
-CAR_WIDTH = 105
-# ----- Gera tela principal
+CAR_LENGTH = 50
+CAR_WIDTH = 100
+# ----- Ge ra tela principal
 window = pygame.display.set_mode((840, 650))
 pygame.display.set_caption('Need For Speed 2D')
 
@@ -18,6 +18,9 @@ pygame.display.set_caption('Need For Speed 2D')
 background = pygame.image.load('img/background.png').convert()
 player_car = pygame.image.load('img/carro.png').convert_alpha()
 player_car = pygame.transform.scale(player_car ,(CAR_LENGTH,CAR_WIDTH))
+obstacle_car = pygame.image.load('img/car_obstacle.png').convert_alpha()
+obstacle_car = pygame.transform.scale(obstacle_car, (CAR_LENGTH, CAR_WIDTH))
+
 explosion_anim = []
 
 for i in range(9):
@@ -53,10 +56,10 @@ class Car(pygame.sprite.Sprite):
             self.rect.x += self.speedx
 
             # Mantem dentro da tela
-            if self.rect.right > WIDTH+75:
-                self.rect.right = WIDTH+75
-            if self.rect.left < 120:
-                self.rect.left = 120
+            if self.rect.right > WIDTH+40:
+                self.rect.right = WIDTH+40
+            if self.rect.left < 150:
+                self.rect.left = 150
 
 class Obstacles(pygame.sprite.Sprite):
     def __init__(self, img):
@@ -114,7 +117,7 @@ all_obstacles = pygame.sprite.Group()
 carro = Car(player_car)
 all_sprites.add(carro)
 for c in range (0, 4):
-    carro_obstaculo = Obstacles(player_car)
+    carro_obstaculo = Obstacles(obstacle_car)
     all_sprites.add(carro_obstaculo)
     all_obstacles.add(carro_obstaculo)
 all_sprites.add(carro)
@@ -133,7 +136,7 @@ while state != DONE:
     for event in pygame.event.get():
         # ----- Verifica consequências
         if event.type == pygame.QUIT:
-            game = False
+            state = DONE
         if event.type == pygame.KEYDOWN:
             # Dependendo da tecla, altera a velocidade.
             if event.key == pygame.K_LEFT:
@@ -156,7 +159,7 @@ while state != DONE:
             carro.kill()
             explosao = Crash(carro.rect.center)
             all_sprites.add(explosao)
-            state = EXPLODING
+            state = DONE
             keys_down = {}
             explosion_tick = pygame.time.get_ticks()
             explosion_duration = explosao.frame_ticks * len(explosao.explosion_anim) + 400
