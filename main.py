@@ -65,8 +65,8 @@ class Obstacles(pygame.sprite.Sprite):
         self.image =img
         self.rect = self.image.get_rect()
         self.rect.x = randint(105, 630)
-        self.rect.y = -100
-        self.speedy = randint(10, 22)
+        self.rect.y = -1500 + randint(0, 1400)
+        self.speedy = randint(16, 22)
     
     def update(self):
         self.rect.y += self.speedy
@@ -147,21 +147,19 @@ while state != DONE:
                 carro.speedx += 14
             if event.key == pygame.K_RIGHT:
                 carro.speedx -= 14
+
+
     if state == PLAYING:
-        hits = pygame.sprite.groupcollide(player_car,all_obstacles,True,True,pygame.sprite.collide_mask)
+        hits = pygame.sprite.spritecollide(carro , all_obstacles, True)
         if len(hits) > 0:
             crash_sound.play()
-            player_car.kill()
-            # Adiciona vidas?
-            explosao = Crash(player_car.rect.center)
+            carro.kill()
+            explosao = Crash(carro.rect.center)
             all_sprites.add(explosao)
             state = EXPLODING
             keys_down = {}
             explosion_tick = pygame.time.get_ticks()
             explosion_duration = explosao.frame_ticks * len(explosao.explosion_anim) + 400
-    
-
-
         
 
     all_sprites.update()
