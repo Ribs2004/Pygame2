@@ -4,4 +4,5 @@ Autores:
 - Mikael Toledo
 - Pedro Aicardi
 - Pedro Ribeiro
+
 O arquivo necessário para que o jogo rode de maneira funcional é o main.py
