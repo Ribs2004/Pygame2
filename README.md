@@ -1,1 +1,2 @@
 # Pygame2
+O jogo se constitui de um jogo 2D, onde o jogador está em alta velocidade e precisa desviar de varios obstáculos para passar de fases e assim ganhando mais pontos conforme o tempo vai passando!
