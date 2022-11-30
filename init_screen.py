@@ -18,7 +18,7 @@ state = PLAYING
 
 def init_screen(screen):
     clock = pygame.time.Clock()
-    background = pygame.image.load(path.join(IMG_DIR,'ciadade-init-2.png'))
+    background = pygame.image.load(path.join(IMG_DIR,'cidade-init-5.png'))
     background = pygame.transform.scale(background, (840, 650))
     background_rect = background.get_rect()
     running = True
@@ -28,9 +28,10 @@ def init_screen(screen):
             if event.type == pygame.QUIT:
                 sys.exit()
             if event.type == pygame.KEYDOWN:
-                state = PLAYING
-                running = False
-                break
+                if event.key == pygame.K_SPACE:
+                    state = PLAYING
+                    running = False
+                    break
         screen.fill(BLACK)
         screen.blit(background,background_rect)
         pygame.display.flip()

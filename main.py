@@ -2,7 +2,9 @@
 # ----- Importa e inicia pacotes
 import pygame
 from random import *
-from init_screen import init_screen, state, DONE, PLAYING, EXPLODING
+from init_screen import init_screen, state, DONE, PLAYING
+from end_screen import end_screen
+
 
 pygame.init()
 
@@ -21,6 +23,7 @@ player_car = pygame.image.load('img/carro.png').convert_alpha()
 player_car = pygame.transform.scale(player_car ,(CAR_LENGTH,CAR_WIDTH))
 obstacle_car = pygame.image.load('img/car_obstacle.png').convert_alpha()
 obstacle_car = pygame.transform.scale(obstacle_car, (CAR_LENGTH, CAR_WIDTH))
+score_font = pygame.font.Font('font/PressStart2P.ttf',28)
 
 explosion_anim = []
 
@@ -33,10 +36,11 @@ for i in range(9):
 #Carrega os sons do jogo
 pygame.mixer.music.set_volume(0.5)
 crash_sound = pygame.mixer.Sound('snd/car_crash.wav')
+corrida_musica = pygame.mixer.Sound('snd/musica_corrida.wav')
 
 # ----- Inicia estruturas de dados
 game = True
-
+score = 0
 # ----- Variável para ajuste de velocidade
 clock = pygame.time.Clock()
 FPS = 30
@@ -125,10 +129,10 @@ while True:
     state = PLAYING
 
     init_screen(window)
-
     # ===== Loop principal =====
     while state != DONE:
         clock.tick(FPS)
+        score += 0.033333
 
         # ----- Trata eventos
         for event in pygame.event.get():
@@ -150,6 +154,7 @@ while True:
                     carro.speedx -= 14
 
         if state == PLAYING:
+            corrida_musica.play()
             hits = pygame.sprite.spritecollide(carro , all_obstacles, True)
             if len(hits) > 0:
                 carro.kill()
@@ -160,14 +165,25 @@ while True:
                 explosion_tick = pygame.time.get_ticks()
                 explosion_duration = explosao.frame_ticks * len(explosao.explosion_anim) + 400
                 crash_sound.play()
-                pygame.time.sleep()
                 state = DONE
+                
+
+            if state == DONE:
+                score = 0
+
+            
+            
+        
 
         all_sprites.update()
         window.blit(background, (0, 0))
+        text_surface = score_font.render("{}".format(int(score)),True,(255,255,0))
+        text_rect = text_surface.get_rect()
+        text_rect.midtop = (WIDTH/2,10)
         all_sprites.draw(window)
+        window.blit(text_surface,(60,60))
         pygame.display.update()  # Mostra o novo frame para o jogador
-
+    end_screen(window)
 # ===== Finalização =====
 pygame.quit()  # Função do PyGame que finaliza os recursos utilizados
 
