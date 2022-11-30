@@ -2,6 +2,7 @@
 # ----- Importa e inicia pacotes
 import pygame
 from random import *
+from init_screen import init_screen, state, DONE, PLAYING, EXPLODING
 
 pygame.init()
 
@@ -32,7 +33,6 @@ for i in range(9):
 #Carrega os sons do jogo
 pygame.mixer.music.set_volume(0.5)
 crash_sound = pygame.mixer.Sound('snd/car_crash.wav')
-
 
 # ----- Inicia estruturas de dados
 game = True
@@ -109,66 +109,64 @@ class Crash(pygame.sprite.Sprite):
                 self.rect = self.image.get_rect()
                 self.rect.center = center
 
-
-
 #assets = load_assets()
-all_sprites = pygame.sprite.Group()
-all_obstacles = pygame.sprite.Group()
-carro = Car(player_car)
-all_sprites.add(carro)
-for c in range (0, 4):
-    carro_obstaculo = Obstacles(obstacle_car)
-    all_sprites.add(carro_obstaculo)
-    all_obstacles.add(carro_obstaculo)
-all_sprites.add(carro)
 
-DONE = 0
-PLAYING = 1
-EXPLODING = 2
-state = PLAYING
+while True:
 
+    all_sprites = pygame.sprite.Group()
+    all_obstacles = pygame.sprite.Group()
+    carro = Car(player_car)
+    all_sprites.add(carro)
+    for c in range (0, 4):
+        carro_obstaculo = Obstacles(obstacle_car)
+        all_sprites.add(carro_obstaculo)
+        all_obstacles.add(carro_obstaculo)
+    all_sprites.add(carro)
+    state = PLAYING
 
-# ===== Loop principal =====
-while state != DONE:
-    clock.tick(FPS)
+    init_screen(window)
 
-    # ----- Trata eventos
-    for event in pygame.event.get():
-        # ----- Verifica consequências
-        if event.type == pygame.QUIT:
-            state = DONE
-        if event.type == pygame.KEYDOWN:
-            # Dependendo da tecla, altera a velocidade.
-            if event.key == pygame.K_LEFT:
-                carro.speedx -= 14
-            if event.key == pygame.K_RIGHT:
-                carro.speedx += 14
-        # Verifica se soltou alguma tecla.
-        if event.type == pygame.KEYUP:
-            # Dependendo da tecla, altera a velocidade.
-            if event.key == pygame.K_LEFT:
-                carro.speedx += 14
-            if event.key == pygame.K_RIGHT:
-                carro.speedx -= 14
+    # ===== Loop principal =====
+    while state != DONE:
+        clock.tick(FPS)
 
+        # ----- Trata eventos
+        for event in pygame.event.get():
+            # ----- Verifica consequências
+            if event.type == pygame.QUIT:
+                state = DONE
+            if event.type == pygame.KEYDOWN:
+                # Dependendo da tecla, altera a velocidade.
+                if event.key == pygame.K_LEFT:
+                    carro.speedx -= 14
+                if event.key == pygame.K_RIGHT:
+                    carro.speedx += 14
+            # Verifica se soltou alguma tecla.
+            if event.type == pygame.KEYUP:
+                # Dependendo da tecla, altera a velocidade.
+                if event.key == pygame.K_LEFT:
+                    carro.speedx += 14
+                if event.key == pygame.K_RIGHT:
+                    carro.speedx -= 14
 
-    if state == PLAYING:
-        hits = pygame.sprite.spritecollide(carro , all_obstacles, True)
-        if len(hits) > 0:
-            crash_sound.play()
-            carro.kill()
-            explosao = Crash(carro.rect.center)
-            all_sprites.add(explosao)
-            state = DONE
-            keys_down = {}
-            explosion_tick = pygame.time.get_ticks()
-            explosion_duration = explosao.frame_ticks * len(explosao.explosion_anim) + 400
-        
+        if state == PLAYING:
+            hits = pygame.sprite.spritecollide(carro , all_obstacles, True)
+            if len(hits) > 0:
+                carro.kill()
+                explosao = Crash(carro.rect.center)
+                all_sprites.add(explosao)
+                all_sprites.update()
+                keys_down = {}
+                explosion_tick = pygame.time.get_ticks()
+                explosion_duration = explosao.frame_ticks * len(explosao.explosion_anim) + 400
+                crash_sound.play()
+                pygame.time.sleep()
+                state = DONE
 
-    all_sprites.update()
-    window.blit(background, (0, 0))
-    all_sprites.draw(window)
-    pygame.display.update()  # Mostra o novo frame para o jogador
+        all_sprites.update()
+        window.blit(background, (0, 0))
+        all_sprites.draw(window)
+        pygame.display.update()  # Mostra o novo frame para o jogador
 
 # ===== Finalização =====
 pygame.quit()  # Função do PyGame que finaliza os recursos utilizados
